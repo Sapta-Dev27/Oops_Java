@@ -47,6 +47,12 @@ Complete **OOPs in Java** preparation for **placements and semester exams**.
 📖 **Study Material:**  
 [Study THIS Keyword](https://codewitharyan.com/tech-blogs/this-keyword-in-oops)
 
+
+# ALL ABOUT POLYMORPHISM
+
+📖 **Study Material:**  
+[Study THIS Keyword](https://codewitharyan.com/tech-blogs/polymorphism-and-its-types)
+
 # ⭐ What is Constructor Chaining ?
 
 > **Constructor chaining in Java** means calling one constructor from another.  
