@@ -51,7 +51,7 @@ Complete **OOPs in Java** preparation for **placements and semester exams**.
 # ALL ABOUT POLYMORPHISM
 
 📖 **Study Material:**  
-[Study THIS Keyword](https://codewitharyan.com/tech-blogs/polymorphism-and-its-types)
+[Study POLYMORHPHISM](https://codewitharyan.com/tech-blogs/polymorphism-and-its-types)
 
 # ⭐ What is Constructor Chaining ?
 
