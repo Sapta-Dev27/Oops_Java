@@ -1912,3 +1912,1341 @@ Then stop and allow the interviewer to ask the next question.
 > second.**
 
 That will make your answers sound natural instead of memorized.
+
+
+# ☕ Java Intermediate Interview Questions — 31 to 38
+
+> Complete interview-ready notes for Questions **31–38**.
+>
+> Simple explanations, examples, interview answers, common follow-ups, traps, and quick revision.
+
+---
+
+# 📚 Table of Contents
+
+- [31. Why Are Strings Immutable?](#31-apart-from-security-why-are-strings-immutable-in-java)
+- [32. Singleton Class](#32-what-is-a-singleton-class-how-do-you-implement-it)
+- [33. Compile-Time Error](#33-which-of-the-below-generates-a-compile-time-error)
+- [34. String vs StringBuffer vs StringBuilder](#34-difference-between-string-stringbuffer-and-stringbuilder)
+- [35. Interface vs Abstract Class](#35-difference-between-interface-and-abstract-class)
+- [36. Compile-Time Errors in a Program](#36-does-this-program-give-a-compile-time-error)
+- [37. Comparator in Java](#37-what-is-a-comparator-in-java)
+- [38. Static and Private Method Overriding](#38-can-static-and-private-methods-be-overridden)
+- [Final Revision Table](#final-revision-table)
+- [Important Interview Traps](#important-interview-traps)
+
+---
+
+# 31. Apart From Security, Why Are Strings Immutable in Java?
+
+### First: What does immutable mean?
+
+Immutable means:
+
+> **Once a String object is created, its value cannot be changed.**
+
+Example:
+
+```java
+String s = "Hello";
+
+s.concat(" World");
+
+System.out.println(s);
+```
+
+### Output
+
+```text
+Hello
+```
+
+`concat()` creates another String rather than changing the original.
+
+---
+
+## Why Are Strings Immutable?
+
+### 1. String Pool
+
+Java maintains a String Pool to reuse String objects.
+
+```java
+String s1 = "Java";
+String s2 = "Java";
+```
+
+They can refer to the same pooled String.
+
+```text
+s1 ──┐
+     ↓
+   "Java"
+     ↑
+s2 ──┘
+```
+
+If Strings were mutable, changing one reference could unexpectedly affect another reference using the same pooled object.
+
+Immutability makes sharing safe.
+
+---
+
+### 2. Thread Safety
+
+Strings can safely be shared between threads because their contents cannot change after creation.
+
+---
+
+### 3. Stable `hashCode()`
+
+Strings are commonly used as keys in:
+
+```java
+HashMap
+HashSet
+```
+
+Example:
+
+```java
+HashMap<String, Integer> map = new HashMap<>();
+
+map.put("Java", 100);
+```
+
+Because a String cannot change, its value and hash code remain stable.
+
+---
+
+### 4. Performance and Reusability
+
+Since String objects cannot change, Java can safely reuse String objects.
+
+This is especially useful with the String Pool.
+
+### Interview Answer
+
+> **"Apart from security, String is immutable mainly because of the String Pool, thread safety, stable hash codes and safe object sharing. Since a String cannot change after creation, the JVM can safely reuse String objects and Strings can safely be used as keys in hash-based collections."**
+
+### Remember
+
+```text
+String immutable
+      ↓
+Safe sharing
+      ↓
+String Pool
+      ↓
+Stable hashCode
+      ↓
+Thread-safe sharing
+```
+
+---
+
+# 32. What Is a Singleton Class? How Do You Implement It?
+
+A **Singleton class** is a class designed so that **only one instance is created** and a common access point is provided to that instance.
+
+## Three Important Things
+
+```text
+1. private constructor
+2. static variable
+3. static getInstance() method
+```
+
+---
+
+## 1. Private Constructor
+
+```java
+private Singleton() {
+}
+```
+
+This prevents direct object creation from outside.
+
+This is not allowed:
+
+```java
+Singleton s = new Singleton(); // ERROR
+```
+
+---
+
+## 2. Static Variable
+
+```java
+private static Singleton instance;
+```
+
+This stores the single object.
+
+---
+
+## 3. `getInstance()` Method
+
+```java
+public static Singleton getInstance() {
+
+    if (instance == null) {
+        instance = new Singleton();
+    }
+
+    return instance;
+}
+```
+
+---
+
+# Complete Example
+
+```java
+class Singleton {
+
+    private static Singleton instance;
+
+    private Singleton() {
+    }
+
+    public static Singleton getInstance() {
+
+        if (instance == null) {
+            instance = new Singleton();
+        }
+
+        return instance;
+    }
+}
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        Singleton s1 = Singleton.getInstance();
+        Singleton s2 = Singleton.getInstance();
+
+        System.out.println(s1 == s2);
+    }
+}
+```
+
+### Output
+
+```text
+true
+```
+
+### Why?
+
+First call:
+
+```java
+Singleton.getInstance();
+```
+
+`instance` is null, so the object is created.
+
+Second call:
+
+```java
+Singleton.getInstance();
+```
+
+The object already exists, so the same object is returned.
+
+```text
+s1 ───────┐
+          ↓
+     Singleton Object
+          ↑
+s2 ───────┘
+```
+
+### Interview Answer
+
+> **"A Singleton class allows only one object to be created. We use a private constructor to prevent direct object creation, a static variable to store the single object, and a static `getInstance()` method to create and return that object."**
+
+### One-Line Answer
+
+> **"Singleton means one class, one object, and one common access point to that object."**
+
+---
+
+## Important Follow-Up: Is This Thread-Safe?
+
+The basic implementation is **not thread-safe**.
+
+Two threads could simultaneously see:
+
+```java
+instance == null
+```
+
+and both create an object.
+
+A simple thread-safe version is:
+
+```java
+class Singleton {
+
+    private static Singleton instance;
+
+    private Singleton() {
+    }
+
+    public static synchronized Singleton getInstance() {
+
+        if (instance == null) {
+            instance = new Singleton();
+        }
+
+        return instance;
+    }
+}
+```
+
+Now only one thread at a time can execute `getInstance()`.
+
+### Interview Point
+
+> **"The basic lazy Singleton implementation is not thread-safe. In a multithreaded environment, synchronization or another thread-safe initialization technique is required."**
+
+---
+
+# 33. Which of the Below Generates a Compile-Time Error?
+
+The actual program/options for Question 33 are not visible in the provided image, so the exact option cannot be identified.
+
+For this type of question, check common compile-time problems.
+
+## 1. Uninitialized Local Variable
+
+```java
+int x;
+
+System.out.println(x);
+```
+
+Compilation error.
+
+---
+
+## 2. Incompatible Types
+
+```java
+int x = "Hello";
+```
+
+Compilation error.
+
+---
+
+## 3. Invalid Access
+
+```java
+class Test {
+
+    private int x;
+}
+```
+
+Trying to access `x` from outside the class causes an access error.
+
+---
+
+## 4. Invalid Overriding
+
+```java
+class Parent {
+
+    public void show() {
+    }
+}
+
+class Child extends Parent {
+
+    protected void show() {
+    }
+}
+```
+
+Compilation error because the child cannot reduce the access level of an overridden method.
+
+---
+
+## 5. Unhandled Checked Exception
+
+```java
+FileReader f = new FileReader("test.txt");
+```
+
+If the checked exception is not caught or declared, compilation fails.
+
+### Important
+
+Do not confuse compile-time errors with runtime errors.
+
+```java
+int x = 10 / 0;
+```
+
+This normally compiles but causes a runtime `ArithmeticException`.
+
+Whereas:
+
+```java
+int x = "Hello";
+```
+
+is a compile-time type error.
+
+### Interview Answer
+
+> **"The exact program is required to identify the exact compile-time error and number of errors. I would check syntax, data types, declarations, access modifiers, inheritance, overriding rules and checked exceptions. Runtime exceptions should not be counted as compile-time errors."**
+
+---
+
+# 34. Difference Between String, StringBuffer and StringBuilder
+
+This is a **very common interview question**.
+
+The easiest way to remember it is:
+
+```text
+String
+→ Immutable
+
+StringBuffer
+→ Mutable
+→ Synchronized
+
+StringBuilder
+→ Mutable
+→ Not synchronized
+```
+
+---
+
+# String
+
+String is immutable.
+
+```java
+String s = "Hello";
+
+s = s + " World";
+```
+
+A new String object is created rather than modifying the old String.
+
+### Use String when:
+
+The text does not need frequent modification.
+
+---
+
+# StringBuffer
+
+StringBuffer is mutable.
+
+```java
+StringBuffer sb = new StringBuffer("Hello");
+
+sb.append(" World");
+
+System.out.println(sb);
+```
+
+### Output
+
+```text
+Hello World
+```
+
+StringBuffer methods are synchronized, so it is designed for thread-safe mutable string operations.
+
+---
+
+# StringBuilder
+
+StringBuilder is also mutable.
+
+```java
+StringBuilder sb = new StringBuilder("Hello");
+
+sb.append(" World");
+
+System.out.println(sb);
+```
+
+### Output
+
+```text
+Hello World
+```
+
+StringBuilder is not synchronized.
+
+Therefore, when synchronization is not required, StringBuilder is generally preferred for better performance.
+
+---
+
+## Comparison
+
+| Feature | String | StringBuffer | StringBuilder |
+|---|---|---|---|
+| Mutable | ❌ No | ✅ Yes | ✅ Yes |
+| Synchronized | Not applicable | ✅ Yes | ❌ No |
+| Repeated modification | Less suitable | Suitable | Most commonly preferred |
+| Thread-safe mutable operations | N/A due to immutability | ✅ | ❌ |
+| Performance | Repeated concatenation can create objects | Generally slower than Builder | Generally faster than Buffer |
+
+### Interview Answer
+
+> **"String is immutable, so modifying it creates another String object. StringBuffer and StringBuilder are mutable and modify the same object. StringBuffer provides synchronized methods and is suitable when synchronized mutable string operations are needed, while StringBuilder is not synchronized and is generally preferred when thread safety is not required."**
+
+### Remember
+
+```text
+String        → Immutable
+StringBuffer  → Mutable + Synchronized
+StringBuilder → Mutable + Not synchronized
+```
+
+---
+
+# 35. Difference Between Interface and Abstract Class
+
+This is one of the **most important Java OOP questions**.
+
+---
+
+# Abstract Class
+
+An abstract class can contain:
+
+- Abstract methods
+- Concrete methods
+- Instance variables
+- Constructors
+- Static members
+- Final members
+
+Example:
+
+```java
+abstract class Animal {
+
+    String name;
+
+    Animal(String name) {
+        this.name = name;
+    }
+
+    abstract void sound();
+
+    void eat() {
+        System.out.println("Eating");
+    }
+}
+```
+
+---
+
+# Interface
+
+An interface is mainly used to define a **contract or capability**.
+
+Modern Java interfaces can contain:
+
+- Abstract methods
+- `default` methods
+- `static` methods
+- `private` methods
+- Constants
+
+Example:
+
+```java
+interface Flyable {
+
+    void fly();
+
+    default void land() {
+        System.out.println("Landing");
+    }
+}
+```
+
+---
+
+## Major Differences
+
+| Abstract Class | Interface |
+|---|---|
+| `abstract class` | `interface` |
+| Can have constructors | Cannot have constructors |
+| Can have instance variables | Fields are implicitly `public static final` |
+| Can have abstract and concrete methods | Can have abstract, default, static and private methods |
+| A class can extend only one class | A class can implement multiple interfaces |
+| Can maintain instance state | Cannot have normal per-object instance fields |
+| Useful for common base implementation | Useful for contracts/capabilities |
+
+---
+
+## Example
+
+```java
+abstract class Animal {
+
+    abstract void sound();
+
+    void sleep() {
+        System.out.println("Sleeping");
+    }
+}
+
+interface Flyable {
+
+    void fly();
+}
+
+class Bird extends Animal implements Flyable {
+
+    public void sound() {
+        System.out.println("Chirp");
+    }
+
+    public void fly() {
+        System.out.println("Flying");
+    }
+}
+```
+
+Here:
+
+```text
+Animal
+→ Common base behavior
+
+Flyable
+→ Capability/contract
+```
+
+### When to Use Abstract Class?
+
+Use an abstract class when related classes need:
+
+- Common state
+- Common implementation
+- Constructors
+- Shared protected/private behavior
+
+### When to Use Interface?
+
+Use an interface when you want:
+
+- A contract
+- A capability
+- Multiple implementations
+- A type that unrelated classes can implement
+
+### Interview Answer
+
+> **"An abstract class is useful when related classes need to share state, constructors and common implementation, while an interface is mainly used to define a contract or capability. A class can extend only one class but can implement multiple interfaces. Abstract classes can have instance variables and constructors, whereas interface fields are implicitly public, static and final."**
+
+### Easy Memory Trick
+
+```text
+Abstract Class
+→ Shared base
+→ State + implementation
+
+Interface
+→ Contract
+→ Capability
+```
+
+---
+
+# 36. Does This Program Give a Compile-Time Error?
+
+The actual program for Question 36 is not visible in the provided image, so the exact number of errors cannot be determined.
+
+For this type of question, check:
+
+1. Syntax
+2. Variable declarations
+3. Data types
+4. Method signatures
+5. Access modifiers
+6. Constructors
+7. Inheritance
+8. Overriding rules
+9. Exception handling
+10. Static/instance access
+11. `final` restrictions
+12. Duplicate declarations
+
+### Important
+
+Don't count runtime exceptions as compile-time errors.
+
+Example:
+
+```java
+int x = 10 / 0;
+```
+
+This generally compiles and fails at runtime.
+
+But:
+
+```java
+int x = "Hello";
+```
+
+fails at compile time because the types are incompatible.
+
+### Interview Answer
+
+> **"I would check the program against Java's compile-time rules, including syntax, types, declarations, access, inheritance, overriding and exception handling. I would distinguish compilation errors from runtime exceptions before counting the errors."**
+
+> **Note:** Send the actual Q36 program if you want the exact number of errors and the reason for each.
+
+---
+
+# 37. What Is a Comparator in Java?
+
+`Comparator` is an interface from:
+
+```java
+java.util.Comparator
+```
+
+It is used to define **custom ordering** for objects.
+
+Its main method is:
+
+```java
+int compare(T o1, T o2)
+```
+
+---
+
+# Example
+
+Suppose:
+
+```java
+class Student {
+
+    String name;
+    int age;
+
+    Student(String name, int age) {
+        this.name = name;
+        this.age = age;
+    }
+}
+```
+
+We want to sort students by age.
+
+```java
+Comparator<Student> byAge = new Comparator<Student>() {
+
+    @Override
+    public int compare(Student s1, Student s2) {
+        return Integer.compare(s1.age, s2.age);
+    }
+};
+```
+
+Then:
+
+```java
+Collections.sort(students, byAge);
+```
+
+Or using a lambda:
+
+```java
+students.sort((s1, s2) -> Integer.compare(s1.age, s2.age));
+```
+
+---
+
+# Comparator vs Comparable
+
+This is a very common follow-up.
+
+## Comparable
+
+Used to define a class's **natural ordering**.
+
+```java
+class Student implements Comparable<Student> {
+
+    int age;
+
+    @Override
+    public int compareTo(Student other) {
+        return Integer.compare(this.age, other.age);
+    }
+}
+```
+
+Method:
+
+```text
+compareTo()
+```
+
+---
+
+## Comparator
+
+Used to define **custom/external ordering**.
+
+```java
+Comparator<Student> byName =
+    (s1, s2) -> s1.name.compareTo(s2.name);
+```
+
+You can create multiple Comparators:
+
+```java
+Comparator<Student> byAge;
+Comparator<Student> byName;
+Comparator<Student> byMarks;
+```
+
+### Comparison
+
+| Comparable | Comparator |
+|---|---|
+| `java.lang.Comparable` | `java.util.Comparator` |
+| `compareTo()` | `compare()` |
+| Natural ordering | Custom ordering |
+| Implemented by the class | Usually separate from the class |
+| Usually one natural ordering | Can have multiple strategies |
+
+### Interview Answer
+
+> **"Comparator is an interface used to define custom ordering for objects. Its main method is `compare()`, which returns a negative value, zero, or a positive value according to the ordering. Unlike Comparable, which defines natural ordering using `compareTo()`, Comparator lets us define multiple external sorting strategies."**
+
+### Remember
+
+```text
+Comparable
+→ compareTo()
+→ Natural ordering
+
+Comparator
+→ compare()
+→ Custom ordering
+```
+
+---
+
+# 38. Can Static and Private Methods Be Overridden?
+
+The statement:
+
+> "In Java, static as well as private method overriding is possible."
+
+is **incorrect**.
+
+Neither static methods nor private methods are overridden.
+
+---
+
+# 1. Static Methods
+
+Static methods belong to the **class**, not to individual objects.
+
+If a child class declares a static method with the same signature, it is called **method hiding**.
+
+```java
+class Parent {
+
+    static void show() {
+        System.out.println("Parent");
+    }
+}
+
+class Child extends Parent {
+
+    static void show() {
+        System.out.println("Child");
+    }
+}
+```
+
+Now:
+
+```java
+Parent p = new Child();
+
+p.show();
+```
+
+### Output
+
+```text
+Parent
+```
+
+This is method hiding, not overriding.
+
+---
+
+# 2. Private Methods
+
+Private methods are **not inherited** by subclasses.
+
+Therefore, they cannot be overridden.
+
+```java
+class Parent {
+
+    private void show() {
+        System.out.println("Parent");
+    }
+}
+
+class Child extends Parent {
+
+    private void show() {
+        System.out.println("Child");
+    }
+}
+```
+
+These are two separate methods.
+
+The child's `show()` is not an override of the parent's private method.
+
+---
+
+# What Can Be Overridden?
+
+An eligible inherited **instance method** can be overridden.
+
+```java
+class Parent {
+
+    void show() {
+        System.out.println("Parent");
+    }
+}
+
+class Child extends Parent {
+
+    @Override
+    void show() {
+        System.out.println("Child");
+    }
+}
+```
+
+```java
+Parent p = new Child();
+
+p.show();
+```
+
+### Output
+
+```text
+Child
+```
+
+### Interview Answer
+
+> **"The statement is incorrect. Static methods cannot be overridden; they are hidden when a subclass declares a static method with the same signature. Private methods also cannot be overridden because they are not inherited by the subclass. Only eligible inherited instance methods can participate in overriding."**
+
+### ⭐ Remember
+
+| Method | Can Be Overridden? |
+|---|---|
+| Normal instance method | ✅ Yes |
+| `final` method | ❌ No |
+| `static` method | ❌ No — hidden |
+| `private` method | ❌ No — not inherited |
+| Constructor | ❌ No |
+
+---
+
+# 🚀 Final Revision Table
+
+| # | Topic | Key Point |
+|---|---|---|
+| 21 | Output question | Trace execution order carefully |
+| 22 | `super` | Parent variable, method and constructor |
+| 23 | Static overloading | ✅ Yes |
+| 24 | Why `main()` static? | JVM can invoke it without an object |
+| 25 | Static overriding | ❌ No — method hiding |
+| 26 | Static members | Class-level variable/method; nested static class |
+| 27 | Garbage collection | Reclaims unreachable heap objects |
+| 28 | ClassLoader | Loads class definitions into JVM |
+| 29 | GC memory | Heap |
+| 30 | Shallow vs deep | Shared nested references vs independent nested objects |
+| 31 | String immutable | Pool, safe sharing, stable hashCode, thread-safe sharing |
+| 32 | Singleton | One instance + common access point |
+| 33 | Compile-time error | Need actual program/options for exact answer |
+| 34 | String/Buffer/Builder | Immutable vs mutable synchronized vs mutable unsynchronized |
+| 35 | Interface/Abstract | Contract/capability vs shared base/state |
+| 36 | Compile-time errors | Need actual program for exact count |
+| 37 | Comparator | Custom ordering using `compare()` |
+| 38 | Static/private overriding | ❌ Neither is overridden |
+
+---
+
+# 🔥 Important Interview Traps
+
+## Trap 1: Static methods can be overloaded
+
+```text
+Static
+→ Can overload
+→ Cannot override
+```
+
+---
+
+## Trap 2: `private` methods cannot be overridden
+
+```text
+private
+→ Not inherited
+→ Cannot override
+```
+
+---
+
+## Trap 3: `s2 = s1` is not a shallow copy
+
+```java
+Student s2 = s1;
+```
+
+means:
+
+```text
+Same object
+```
+
+Shallow copy means:
+
+```text
+New outer object
++
+Shared nested object
+```
+
+---
+
+## Trap 4: `System.gc()` does not force garbage collection
+
+```java
+System.gc();
+```
+
+is only a request/hint.
+
+---
+
+## Trap 5: String is immutable
+
+```java
+String s = "Hello";
+
+s.concat(" World");
+
+System.out.println(s);
+```
+
+Output:
+
+```text
+Hello
+```
+
+---
+
+## Trap 6: StringBuilder vs StringBuffer
+
+```text
+StringBuffer
+→ synchronized
+
+StringBuilder
+→ not synchronized
+→ generally preferred when synchronization isn't needed
+```
+
+---
+
+## Trap 7: Interface can have implemented methods
+
+Modern Java interfaces can contain:
+
+```text
+default methods
+static methods
+private methods
+```
+
+So don't say:
+
+> "An interface can contain only abstract methods."
+
+That is outdated.
+
+---
+
+## Trap 8: Static nested class vs static top-level class
+
+```text
+Top-level static class
+→ ❌ Not allowed
+
+Static nested class
+→ ✅ Allowed
+```
+
+---
+
+# 🎯 Best Way to Answer in the Interview
+
+For most questions, use:
+
+```text
+Definition
+    ↓
+Why
+    ↓
+Small example
+    ↓
+Important distinction
+```
+
+For example:
+
+### Interviewer:
+**"Can static methods be overridden?"**
+
+### You:
+
+> **"No, static methods cannot be overridden because they belong to the class rather than being dynamically dispatched based on the object. If a subclass declares a static method with the same signature, it is called method hiding. The method is resolved based on the reference type."**
+
+Then stop.
+
+Let the interviewer ask the follow-up.
+
+---
+
+# ⭐ Most Important Answers to Memorize
+
+### String Immutability
+
+> **"String is immutable mainly because of the String Pool, safe sharing, thread safety and stable hash codes. Since String objects cannot change, the JVM can safely reuse them and they remain safe as keys in hash-based collections."**
+
+### Singleton
+
+> **"A Singleton class allows only one object to be created. We use a private constructor to prevent direct object creation, a static variable to store the single object, and a static `getInstance()` method to create and return that object."**
+
+### String vs StringBuffer vs StringBuilder
+
+> **"String is immutable. StringBuffer and StringBuilder are mutable. StringBuffer is synchronized, while StringBuilder is not synchronized and is generally preferred when thread safety is not required."**
+
+### Abstract Class vs Interface
+
+> **"An abstract class is useful for sharing state and implementation among related classes, while an interface is mainly used to define a contract or capability. A class can extend only one class but can implement multiple interfaces."**
+
+### Comparator
+
+> **"Comparator is used to define custom ordering for objects using the `compare()` method. Comparable defines natural ordering using `compareTo()`, while Comparator allows multiple custom sorting strategies."**
+
+### Static/Private Overriding
+
+> **"Static methods are hidden, not overridden, and private methods cannot be overridden because they are not inherited. Therefore, neither static nor private methods participate in normal method overriding."**
+
+
+---
+
+# 🚀 Final Revision Table
+
+| # | Topic | Key Point |
+|---|---|---|
+| 31 | String immutability | String Pool, safe sharing, thread safety and stable hashCode |
+| 32 | Singleton | One instance + common access point |
+| 33 | Compile-time error | Need the actual program/options for the exact answer |
+| 34 | String / Buffer / Builder | Immutable vs mutable synchronized vs mutable unsynchronized |
+| 35 | Interface / Abstract class | Contract/capability vs shared base/state |
+| 36 | Compile-time errors | Need the actual program for the exact count |
+| 37 | Comparator | Custom ordering using `compare()` |
+| 38 | Static/private overriding | Neither is overridden |
+
+---
+
+# 🔥 Important Interview Traps
+
+## Trap 1: Static methods can be overloaded
+
+```text
+Static
+→ Can be overloaded
+→ Cannot be overridden
+```
+
+---
+
+## Trap 2: Private methods cannot be overridden
+
+```text
+private
+→ Not inherited
+→ Cannot be overridden
+```
+
+---
+
+## Trap 3: `s2 = s1` is not a shallow copy
+
+```java
+Student s2 = s1;
+```
+
+means both references point to the **same object**.
+
+Shallow copy means:
+
+```text
+New outer object
++
+Shared nested object
+```
+
+---
+
+## Trap 4: `System.gc()` does not force garbage collection
+
+```java
+System.gc();
+```
+
+is only a request/hint to the JVM.
+
+---
+
+## Trap 5: String is immutable
+
+```java
+String s = "Hello";
+
+s.concat(" World");
+
+System.out.println(s);
+```
+
+Output:
+
+```text
+Hello
+```
+
+---
+
+## Trap 6: StringBuilder vs StringBuffer
+
+```text
+StringBuffer
+→ synchronized
+
+StringBuilder
+→ not synchronized
+→ generally preferred when synchronization isn't needed
+```
+
+---
+
+## Trap 7: Interfaces can have implemented methods
+
+Modern Java interfaces can contain:
+
+```text
+default methods
+static methods
+private methods
+```
+
+So don't say:
+
+> "An interface can contain only abstract methods."
+
+That statement is outdated.
+
+---
+
+## Trap 8: Static nested class vs static top-level class
+
+```text
+Top-level static class
+→ ❌ Not allowed
+
+Static nested class
+→ ✅ Allowed
+```
+
+---
+
+# 🎯 Best Way to Answer in the Interview
+
+For most questions, use:
+
+```text
+Definition
+    ↓
+Why
+    ↓
+Small example
+    ↓
+Important distinction
+```
+
+Don't give a long lecture unless the interviewer asks for more detail.
+
+---
+
+# ⭐ Most Important Answers to Memorize
+
+### String Immutability
+
+> **"String is immutable mainly because of the String Pool, safe sharing, thread safety and stable hash codes. Since String objects cannot change, the JVM can safely reuse them and they remain safe as keys in hash-based collections."**
+
+### Singleton
+
+> **"A Singleton class allows only one object to be created. We use a private constructor to prevent direct object creation, a static variable to store the single object, and a static `getInstance()` method to create and return that object."**
+
+### String vs StringBuffer vs StringBuilder
+
+> **"String is immutable. StringBuffer and StringBuilder are mutable. StringBuffer is synchronized, while StringBuilder is not synchronized and is generally preferred when thread safety is not required."**
+
+### Abstract Class vs Interface
+
+> **"An abstract class is useful for sharing state and implementation among related classes, while an interface is mainly used to define a contract or capability. A class can extend only one class but can implement multiple interfaces."**
+
+### Comparator
+
+> **"Comparator is used to define custom ordering for objects using the `compare()` method. Comparable defines natural ordering using `compareTo()`, while Comparator allows multiple custom sorting strategies."**
+
+### Static/Private Overriding
+
+> **"Static methods are hidden, not overridden, and private methods cannot be overridden because they are not inherited. Therefore, neither static nor private methods participate in normal method overriding."**
+
