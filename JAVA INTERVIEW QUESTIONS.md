@@ -3250,3 +3250,848 @@ Don't give a long lecture unless the interviewer asks for more detail.
 
 > **"Static methods are hidden, not overridden, and private methods cannot be overridden because they are not inherited. Therefore, neither static nor private methods participate in normal method overriding."**
 
+# Java Intermediate Interview Questions 39–49
+
+This README contains the questions from the provided interview-question list, with simple explanations, examples, and interview-ready answers.
+
+---
+
+# 39. What makes a HashSet different from a TreeSet?
+
+Both `HashSet` and `TreeSet` store **unique elements**, but they work differently.
+
+## HashSet
+
+```java
+HashSet<Integer> set = new HashSet<>();
+
+set.add(30);
+set.add(10);
+set.add(20);
+set.add(10);
+```
+
+Characteristics:
+
+- Does not allow duplicate elements
+- Does not maintain sorted order
+- Usually provides faster `add()`, `remove()`, and `contains()` operations
+- Allows one `null` element
+- Uses hashing internally
+
+Example output order is not guaranteed:
+
+```text
+30 10 20
+```
+
+## TreeSet
+
+```java
+TreeSet<Integer> set = new TreeSet<>();
+
+set.add(30);
+set.add(10);
+set.add(20);
+set.add(10);
+```
+
+Output:
+
+```text
+10 20 30
+```
+
+Characteristics:
+
+- Does not allow duplicates
+- Maintains elements in sorted order
+- Generally slower than `HashSet`
+- Does not allow `null` with natural ordering
+- Uses a tree-based data structure internally
+
+## Comparison
+
+| HashSet | TreeSet |
+|---|---|
+| No duplicates | No duplicates |
+| No guaranteed sorted order | Sorted order |
+| Generally faster | Generally slower |
+| Hash-based | Tree-based |
+| Allows one `null` | Generally does not allow `null` |
+
+### Interview Answer
+
+> "HashSet stores unique elements without guaranteeing sorted order and generally provides faster operations. TreeSet also stores unique elements but maintains them in sorted order. HashSet is hash-based, while TreeSet is tree-based."
+
+---
+
+# 40. Why is the character array preferred over String for storing confidential information?
+
+A `char[]` is often preferred over a `String` for sensitive information such as passwords because a `String` is **immutable**.
+
+Once a String object is created, its contents cannot be changed.
+
+```java
+String password = "secret123";
+```
+
+The original contents remain in memory until the JVM eventually removes the object through garbage collection.
+
+With a character array:
+
+```java
+char[] password = {'s', 'e', 'c', 'r', 'e', 't'};
+
+Arrays.fill(password, '\0');
+```
+
+We can explicitly overwrite the contents after use.
+
+### Important
+
+Using `char[]` does **not guarantee perfect security**. It simply gives us more control over when the sensitive data is cleared.
+
+### Interview Answer
+
+> "A char array is preferred for sensitive information because it is mutable, so its contents can be explicitly overwritten after use. String is immutable, so we cannot directly clear its contents."
+
+---
+
+# 41. What do we get in the JDK file?
+
+The **JDK (Java Development Kit)** provides the tools and components needed to develop and run Java applications.
+
+The JDK contains:
+
+```text
+JDK
+├── JRE
+│   ├── JVM
+│   └── Java Class Libraries
+│
+└── Development Tools
+    ├── javac
+    ├── java
+    ├── javadoc
+    ├── jar
+    └── jdb
+```
+
+### Important Tools
+
+#### `javac`
+
+Compiles Java source code into bytecode.
+
+```bash
+javac Test.java
+```
+
+Produces:
+
+```text
+Test.class
+```
+
+#### `java`
+
+Runs a compiled Java application.
+
+```bash
+java Test
+```
+
+#### `javadoc`
+
+Generates documentation from Java source code.
+
+#### `jar`
+
+Creates and manages JAR files.
+
+#### `jdb`
+
+Java debugger.
+
+### Interview Answer
+
+> "The JDK is the complete development kit for Java. It includes the runtime environment and development tools such as javac, java, javadoc, jar, and debugging tools."
+
+---
+
+# 42. What are the differences between JVM, JRE, and JDK in Java?
+
+These three terms are commonly asked together.
+
+## JVM
+
+**Java Virtual Machine**
+
+The JVM executes Java bytecode.
+
+```text
+.class file
+    ↓
+JVM
+    ↓
+Machine instructions
+```
+
+Its responsibilities include:
+
+- Executing bytecode
+- Memory management
+- Garbage collection
+- Providing platform independence
+
+---
+
+## JRE
+
+**Java Runtime Environment**
+
+JRE provides the environment required to run Java applications.
+
+Conceptually:
+
+```text
+JRE
+ ├── JVM
+ └── Java Libraries
+```
+
+---
+
+## JDK
+
+**Java Development Kit**
+
+JDK is used to develop Java applications.
+
+Conceptually:
+
+```text
+JDK
+ ├── JRE/runtime components
+ └── Development tools
+```
+
+### Easy Relationship
+
+```text
+JDK
+ ↓
+Runtime + Development Tools
+
+Runtime
+ ↓
+JVM + Java Libraries
+```
+
+### Comparison
+
+| JVM | JRE | JDK |
+|---|---|---|
+| Runs bytecode | Runs Java applications | Develops Java applications |
+| Part of runtime | Runtime environment | Development kit |
+| Executes `.class` files | JVM + libraries | Runtime + development tools |
+
+### Interview Answer
+
+> "JVM is responsible for executing Java bytecode. JRE provides the runtime environment, including the JVM and required libraries. JDK is the complete development kit containing the runtime components plus development tools such as the Java compiler."
+
+---
+
+# 43. What are the differences between HashMap and HashTable in Java?
+
+Both store data as:
+
+```text
+key → value
+```
+
+## HashMap
+
+```java
+HashMap<Integer, String> map = new HashMap<>();
+
+map.put(1, "Java");
+map.put(2, "Python");
+map.put(null, "C++");
+```
+
+Characteristics:
+
+- Not synchronized
+- Generally faster for ordinary single-threaded use
+- Allows one `null` key
+- Allows multiple `null` values
+- Modern and commonly preferred
+
+## Hashtable
+
+```java
+Hashtable<Integer, String> table = new Hashtable<>();
+
+table.put(1, "Java");
+table.put(2, "Python");
+```
+
+Characteristics:
+
+- Synchronized
+- Generally slower than `HashMap`
+- Does not allow `null` keys
+- Does not allow `null` values
+- Legacy class
+
+## What is a null key?
+
+A map stores:
+
+```text
+key → value
+```
+
+Normally:
+
+```text
+1 → Java
+2 → Python
+```
+
+A `null` key means:
+
+```text
+null → Java
+```
+
+`HashMap` allows one `null` key:
+
+```java
+map.put(null, "Java");
+```
+
+A map cannot have multiple identical keys.
+
+```java
+map.put(null, "Java");
+map.put(null, "Python");
+```
+
+The second value replaces the first.
+
+Result:
+
+```text
+null → Python
+```
+
+## What does synchronized mean?
+
+Synchronization controls access to shared data when multiple threads are working at the same time.
+
+Conceptually:
+
+```text
+Thread 1 → 🔒 → Shared Map
+Thread 2 → waits
+```
+
+The lock helps coordinate access so that multiple threads do not perform conflicting operations at the same time.
+
+### Comparison
+
+| HashMap | Hashtable |
+|---|---|
+| Not synchronized | Synchronized |
+| Generally faster | Generally slower |
+| One `null` key allowed | No `null` key |
+| Multiple `null` values allowed | No `null` values |
+| Modern | Legacy |
+
+### Modern Alternative
+
+For concurrent applications, `ConcurrentHashMap` is generally preferred over `Hashtable`.
+
+### Interview Answer
+
+> "HashMap is not synchronized and generally provides better performance for ordinary use. It allows one null key and multiple null values. Hashtable is a legacy synchronized class that does not allow null keys or values. For modern concurrent applications, ConcurrentHashMap is generally preferred."
+
+---
+
+# 44. What is the importance of reflection in Java?
+
+**Reflection** allows a Java program to inspect and interact with classes, methods, fields, and constructors at runtime.
+
+For example:
+
+```java
+Class<?> cls = String.class;
+
+System.out.println(cls.getName());
+```
+
+Reflection can be used to:
+
+- Find information about a class
+- Inspect methods
+- Inspect fields
+- Inspect constructors
+- Create objects dynamically
+- Invoke methods dynamically
+- Access certain members reflectively
+
+Example:
+
+```java
+Class<?> cls = Student.class;
+
+Method[] methods = cls.getDeclaredMethods();
+
+for (Method method : methods) {
+    System.out.println(method.getName());
+}
+```
+
+### Where is Reflection Used?
+
+Reflection is commonly used internally by:
+
+- Frameworks
+- Dependency injection systems
+- Testing frameworks
+- Serialization libraries
+- ORM frameworks
+
+### Disadvantages
+
+Reflection can:
+
+- Be harder to understand
+- Reduce type safety
+- Have performance overhead
+- Make code more complex
+
+### Interview Answer
+
+> "Reflection is a Java mechanism that allows us to inspect and interact with classes, methods, fields, and constructors at runtime. It is widely used by frameworks and testing tools."
+
+---
+
+# 45. What are the different ways of threads usage?
+
+There are several ways to create and use threads in Java.
+
+## 1. Extending `Thread`
+
+```java
+class MyThread extends Thread {
+
+    public void run() {
+        System.out.println("Thread is running");
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+
+        MyThread t = new MyThread();
+        t.start();
+    }
+}
+```
+
+Here, we override `run()` and call `start()`.
+
+---
+
+## 2. Implementing `Runnable`
+
+```java
+class MyTask implements Runnable {
+
+    public void run() {
+        System.out.println("Thread is running");
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+
+        Thread t = new Thread(new MyTask());
+        t.start();
+    }
+}
+```
+
+This is generally preferred when we only need to define a task because the class can still extend another class.
+
+---
+
+## 3. Using Lambda Expression
+
+Since `Runnable` is a functional interface:
+
+```java
+Runnable task = () -> {
+    System.out.println("Thread is running");
+};
+
+Thread t = new Thread(task);
+t.start();
+```
+
+Or:
+
+```java
+new Thread(() -> System.out.println("Hello")).start();
+```
+
+---
+
+## 4. Using ExecutorService
+
+For real applications, thread pools are commonly preferred over manually creating many threads.
+
+```java
+ExecutorService executor = Executors.newFixedThreadPool(2);
+
+executor.submit(() -> {
+    System.out.println("Task running");
+});
+
+executor.shutdown();
+```
+
+### Interview Answer
+
+> "Threads can be created by extending Thread or implementing Runnable. We can also use lambda expressions with Runnable. For managing multiple tasks efficiently, ExecutorService and thread pools are commonly preferred."
+
+---
+
+# 46. What are the different types of Thread Priorities in Java? And what is the default priority of a thread assigned by JVM?
+
+Java provides three commonly used priority constants:
+
+```java
+Thread.MIN_PRIORITY     // 1
+Thread.NORM_PRIORITY    // 5
+Thread.MAX_PRIORITY     // 10
+```
+
+### Default Priority
+
+A newly created thread normally inherits the priority of the thread that creates it.
+
+The default priority of the main thread is:
+
+```text
+5
+```
+
+So a thread created from the normal-priority main thread normally receives priority `5`.
+
+Example:
+
+```java
+Thread t = new Thread(() -> {
+    System.out.println("Running");
+});
+
+System.out.println(t.getPriority());
+```
+
+Output:
+
+```text
+5
+```
+
+### Setting Priority
+
+```java
+t.setPriority(Thread.MAX_PRIORITY);
+```
+
+or:
+
+```java
+t.setPriority(10);
+```
+
+### Important
+
+Thread priority is a **scheduling hint**, not a guarantee that a higher-priority thread will always execute first.
+
+### Interview Answer
+
+> "Java thread priorities range from 1 to 10. MIN_PRIORITY is 1, NORM_PRIORITY is 5, and MAX_PRIORITY is 10. A newly created thread normally inherits its creator's priority, and the main thread normally has priority 5."
+
+---
+
+# 47. What is the difference between the program and the process?
+
+## Program
+
+A **program** is a set of instructions stored on a storage device.
+
+For example:
+
+```text
+MyApp.java
+MyApp.class
+```
+
+It is passive until it is executed.
+
+## Process
+
+A **process** is a program that is currently executing.
+
+For example:
+
+```text
+Program
+   ↓ execution
+Process
+```
+
+A process has resources such as:
+
+- Memory
+- CPU time
+- File handles
+- Other operating-system resources
+
+### Simple Example
+
+Think of a recipe:
+
+```text
+Recipe → Program
+Cooking the recipe → Process
+```
+
+The recipe is stored instructions.
+
+Cooking is the actual execution.
+
+### Interview Answer
+
+> "A program is a set of instructions stored on a system, while a process is a program that is currently being executed and has allocated system resources."
+
+---
+
+# 48. What is the difference between the `throw` and `throws` keyword in Java?
+
+Both are related to exception handling, but they have different purposes.
+
+## `throw`
+
+`throw` is used to **explicitly throw an exception**.
+
+```java
+public void checkAge(int age) {
+
+    if (age < 18) {
+        throw new IllegalArgumentException("Age must be 18 or above");
+    }
+}
+```
+
+It throws a specific exception object.
+
+---
+
+## `throws`
+
+`throws` is used in a method declaration to indicate that the method may throw certain exceptions.
+
+```java
+public void readFile() throws IOException {
+    // file operations
+}
+```
+
+The caller must handle or further declare the checked exception.
+
+## Comparison
+
+| `throw` | `throws` |
+|---|---|
+| Used to actually throw an exception | Declares possible exceptions |
+| Used inside method/block | Used in method declaration |
+| Followed by an exception object | Followed by exception class names |
+| Throws one exception at a time | Can declare multiple exceptions |
+
+Example:
+
+```java
+throw new IOException();
+```
+
+vs.
+
+```java
+void read() throws IOException, SQLException {
+}
+```
+
+### Interview Answer
+
+> "`throw` is used to explicitly throw an exception, while `throws` is used in a method declaration to declare that the method may throw one or more exceptions."
+
+---
+
+# 49. What are the differences between constructor and method of a class in Java?
+
+A constructor and a method are both members associated with a class, but they serve different purposes.
+
+## Constructor
+
+A constructor is used to initialize an object.
+
+```java
+class Student {
+
+    String name;
+
+    Student(String name) {
+        this.name = name;
+    }
+}
+```
+
+Creating an object:
+
+```java
+Student s = new Student("Rahul");
+```
+
+## Method
+
+A method performs some operation or behavior.
+
+```java
+class Student {
+
+    void study() {
+        System.out.println("Student is studying");
+    }
+}
+```
+
+Calling the method:
+
+```java
+s.study();
+```
+
+## Comparison
+
+| Constructor | Method |
+|---|---|
+| Initializes an object | Performs an operation |
+| Same name as class | Can have any valid name |
+| Has no return type | Can have a return type |
+| Called automatically during object creation | Called explicitly |
+| Cannot be inherited | Methods can be inherited depending on access/modifiers |
+| Cannot be `static`, `final`, or `abstract` | Methods can use these modifiers where applicable |
+
+### Important
+
+A constructor does **not** have a return type.
+
+This is a constructor:
+
+```java
+Student() {
+}
+```
+
+This is a method:
+
+```java
+void Student() {
+}
+```
+
+The second one is a method, not a constructor, because it has a return type (`void`).
+
+### Interview Answer
+
+> "A constructor is used to initialize an object and has the same name as the class with no return type. A method represents behavior or an operation and can have a return type. Constructors are invoked during object creation, while methods are called explicitly."
+
+---
+
+# 🎯 Quick Revision
+
+| No. | Topic | Key Point |
+|---|---|---|
+| 39 | HashSet vs TreeSet | HashSet is unordered; TreeSet is sorted |
+| 40 | `char[]` vs String | `char[]` can be overwritten |
+| 41 | JDK | Development kit + runtime components + tools |
+| 42 | JVM/JRE/JDK | JVM runs, JRE provides runtime, JDK develops |
+| 43 | HashMap vs Hashtable | HashMap is unsynchronized; Hashtable is legacy synchronized |
+| 44 | Reflection | Inspect/use classes at runtime |
+| 45 | Thread usage | Thread, Runnable, Lambda, ExecutorService |
+| 46 | Thread priority | 1–10; normal priority is 5 |
+| 47 | Program vs Process | Program = instructions; Process = executing program |
+| 48 | `throw` vs `throws` | Throw exception vs declare exception |
+| 49 | Constructor vs Method | Constructor initializes; method performs behavior |
+
+---
+
+# 🧠 One-Line Memory Tricks
+
+### HashSet vs TreeSet
+
+> **HashSet = unique + no sorted order**
+
+> **TreeSet = unique + sorted**
+
+### `char[]` vs String
+
+> **String is immutable; char[] can be cleared.**
+
+### JVM / JRE / JDK
+
+> **JVM runs → JRE provides runtime → JDK develops**
+
+### HashMap / Hashtable
+
+> **HashMap = modern + unsynchronized + null allowed**
+
+> **Hashtable = legacy + synchronized + null not allowed**
+
+### Reflection
+
+> **Reflection = inspect classes at runtime**
+
+### Threads
+
+> **Thread / Runnable / Lambda / ExecutorService**
+
+### Priority
+
+> **1 = minimum, 5 = normal, 10 = maximum**
+
+### Program / Process
+
+> **Program = passive instructions**
+
+> **Process = running program**
+
+### `throw` / `throws`
+
+> **throw = do it**
+
+> **throws = declare it**
+
+### Constructor / Method
+
+> **Constructor = initialize**
+
+> **Method = perform an action**
